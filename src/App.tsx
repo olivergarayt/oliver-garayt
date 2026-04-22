@@ -97,9 +97,17 @@ export default function App() {
         }
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setErrorMsg('🍄 *Interferencia temporal.* Siento que algunas hifas de la red no logran conectar con el núcleo en este momento. Dame un instante y vuelve a enviarme tu mensaje.');
+      
+      const isQuotaRegex = /429|quota|resource_exhausted/i;
+      const errorMessage = error?.message || '';
+
+      if (isQuotaRegex.test(errorMessage) || error?.status === 429) {
+        setErrorMsg('🍄 *Nutrientes agotados.* Has excedido tu cuota de la API de Gemini (Error 429). Por favor, revisa tus límites o métodos de facturación en Google AI Studio.');
+      } else {
+        setErrorMsg('🍄 *Interferencia temporal.* Siento que algunas hifas de la red no logran conectar con el núcleo en este momento. Dame un instante y vuelve a enviarme tu mensaje.');
+      }
       
       // On error, remove the incomplete model message and restore input for retry
       setMessages(newMessages); 
